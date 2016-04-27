@@ -49,6 +49,9 @@ class DAQFunctionGenerator(object):
     
     @property
     def frequency(self):
+        """
+        The frequency of the output waveform
+        """
         return self._frequency
     
     @frequency.setter
@@ -58,6 +61,9 @@ class DAQFunctionGenerator(object):
         
     @property
     def offset(self):
+        """
+        Voltage offset of the output waveform.
+        """
         return self._offset
     
     @offset.setter
@@ -111,8 +117,8 @@ class DAQFunctionGenerator(object):
                 self.stop()
             
             t_values = np.linspace(t_start,t_end,updateSize,endpoint=t_end==t_max)
-            waveform = self.amplitude * np.sin(2*np.pi*self.frequency * tValues)
-            data = (self.offset + waveform) / self.external_amplification
+            waveform = self.offset + self.amplitude * np.sin(2*np.pi*self.frequency * tValues)
+            data = np.clip(waveform / self.external_amplification, self._voltageRange[0], self._voltageRange[1])
 
             samplesWritten = daq.int32()
             self._ao.CfgSampClkTiming("",sampleFrequency,daq.DAQmx_Val_Rising,daq.DAQmx_Val_ContSamps,self.__updateSize)
