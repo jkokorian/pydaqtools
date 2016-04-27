@@ -15,6 +15,13 @@ class DAQFunctionGenerator(object):
     
     
     def __init__(self,channel, voltageRange=(-10,10)):
+        """
+        Creates a new DAQFunctionGenerator object that controls a single analog output channel of a NI DAQmx interface.
+
+        parameters:
+            channel (str): the analog output channel this function generator controls.
+            voltageRange (tuple): the minimum and maximum values of the output AD-converter.
+        """
         self._channel = channel
         self._voltageRange = voltageRange
         
