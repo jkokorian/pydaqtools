@@ -107,21 +107,22 @@ class DAQFunctionGenerator(object):
         
         taskStarted = False
         t_start = 0
-        t_max = self._number_of_periods * self._frequency
+        t_max = self._number_of_periods / self._frequency
         t_end = None
         while not self._stop_requested:
 
             t_end = t_start + updateInterval
+            
             if t_max > 0 and t_end > t_max:
                 t_end = t_max
                 self.stop()
             
-            t_values = np.linspace(t_start,t_end,updateSize,endpoint=t_end==t_max)
-            waveform = self.offset + self.amplitude * np.sin(2*np.pi*self.frequency * tValues)
+            t_values = np.linspace(t_start,t_end,self.__updateSize,endpoint=t_end==t_max)
+            waveform = self.offset + self.amplitude * np.sin(2*np.pi*self.frequency * t_values)
             data = np.clip(waveform / self.external_amplification, self._voltageRange[0], self._voltageRange[1])
 
             samplesWritten = daq.int32()
-            self._ao.CfgSampClkTiming("",sampleFrequency,daq.DAQmx_Val_Rising,daq.DAQmx_Val_ContSamps,self.__updateSize)
+            self._ao.CfgSampClkTiming("",self.__sampleFrequency,daq.DAQmx_Val_Rising,daq.DAQmx_Val_ContSamps,self.__updateSize)
             
             self._ao.WriteAnalogF64(self.__updateSize, True, 10.0, daq.DAQmx_Val_GroupByChannel, data, daq.byref(samplesWritten), None)
             if not taskStarted:
@@ -138,7 +139,6 @@ class DAQFunctionGenerator(object):
         self._initialize_task()
         self._thread = None
         self._stop_requested = False
-        print "finished"
         
     def start(self):
         if not self.is_running:
@@ -146,3 +146,5 @@ class DAQFunctionGenerator(object):
             
     def stop(self):
         self._stop_requested = True
+        
+    
