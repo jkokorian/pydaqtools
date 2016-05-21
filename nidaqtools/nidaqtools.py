@@ -33,7 +33,7 @@ class DAQFunctionGenerator(object):
         self._number_of_periods = 0
         
         self._stop_requested = False
-        
+        self._waveform_function = np.sin
         
         self._thread = None
         
@@ -96,6 +96,15 @@ class DAQFunctionGenerator(object):
     @external_amplification.setter
     def external_amplification(self,value):
         self._external_amplification = value
+
+    @property
+    def waveform_function(self):
+        return self._waveform_function
+        
+    @waveform_function.setter
+    def waveform_function(self,value):
+        assert callable(value)
+        self._waveform_function = value
     
     @property
     def is_running(self):
@@ -118,7 +127,7 @@ class DAQFunctionGenerator(object):
                 self.stop()
             
             t_values = np.linspace(t_start,t_end,self.__updateSize,endpoint=t_end==t_max)
-            waveform = self.offset + self.amplitude * np.sin(2*np.pi*self.frequency * t_values)
+            waveform = self.offset + self.amplitude * self._waveform_function(2*np.pi*self.frequency * t_values)
             data = np.clip(waveform / self.external_amplification, self._voltageRange[0], self._voltageRange[1])
 
             samplesWritten = daq.int32()

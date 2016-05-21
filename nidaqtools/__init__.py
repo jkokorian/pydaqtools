@@ -1,0 +1,1 @@
+from nidaqtools import DAQFunctionGenerator
