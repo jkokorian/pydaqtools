@@ -126,7 +126,7 @@ class DAQFunctionGenerator(object):
                 t_end = t_max
                 self.stop()
             
-            t_values = np.linspace(t_start,t_end,self.__updateSize,endpoint=t_end==t_max)
+            t_values = np.linspace(t_start, t_end, self.__updateSize, endpoint=t_end==t_max)
             waveform = self.offset + self.amplitude * self._waveform_function(2*np.pi*self.frequency * t_values)
             data = np.clip(waveform / self.external_amplification, self._voltageRange[0], self._voltageRange[1])
 
